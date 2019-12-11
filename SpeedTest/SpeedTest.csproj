@@ -5,7 +5,7 @@
     <Description>SpeedTest.Net client library to test internet bandwidth using speedtest.net</Description>
     <PackageTags>speedtest,speedtest.net</PackageTags>
 
-    <TargetFrameworks>netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
 
     <AssemblyName>SpeedTest</AssemblyName>
     <RootNamespace>SpeedTest</RootNamespace>

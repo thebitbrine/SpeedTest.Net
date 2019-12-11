@@ -53,8 +53,7 @@ namespace SpeedTest
             {
                 throw new InvalidOperationException("SpeedTest does not return any server");
             }
-
-            var ignoredIds = settings.ServerConfig.IgnoreIds.Split(",", StringSplitOptions.RemoveEmptyEntries);
+            var ignoredIds = settings.ServerConfig.IgnoreIds.Split(',').SkipWhile(string.IsNullOrWhiteSpace);
             serversConfig.CalculateDistances(settings.Client.GeoCoordinate);
             settings.Servers = serversConfig.Servers
                 .Where(s => !ignoredIds.Contains(s.Id.ToString()))
