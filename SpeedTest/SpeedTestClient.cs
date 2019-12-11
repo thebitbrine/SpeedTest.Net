@@ -13,14 +13,13 @@ namespace SpeedTest
 {
     public class SpeedTestClient : ISpeedTestClient
     {
-        private const string ConfigUrl = "http://www.speedtest.net/speedtest-config.php";
+        private const string ConfigUrl = "https://www.speedtest.net/speedtest-config.php";
 
-        private static readonly string[] ServersUrls = new []
-        {
-            "http://www.speedtest.net/speedtest-servers-static.php",
-            "http://c.speedtest.net/speedtest-servers-static.php",
-            "http://www.speedtest.net/speedtest-servers.php",
-            "http://c.speedtest.net/speedtest-servers.php"
+        private static readonly string[] ServersUrls = {
+            "https://www.speedtest.net/speedtest-servers-static.php",
+            "https://c.speedtest.net/speedtest-servers-static.php",
+            "https://www.speedtest.net/speedtest-servers.php",
+            "https://c.speedtest.net/speedtest-servers.php"
         };
 
         //private readonly int[] downloadSizes = { 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000 };
