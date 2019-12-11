@@ -10,9 +10,9 @@
     <PackOnBuild>true</PackOnBuild>
     <Authors>Uladzimir Kazakevich,Brendan Grant,Chino Chang</Authors>
     <PackageId>SpeedTest.Net</PackageId>
-    <PackageVersion>1.2.0</PackageVersion>
+    <PackageVersion>1.4.0</PackageVersion>
     <PackageProjectUrl>https://github.com/JoyMoe/SpeedTest.Net</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/JoyMoe/SpeedTest.Net/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicense>LICENSE</PackageLicense>
     <Title>SpeedTest.Net</Title>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
@@ -23,6 +23,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\LICENSE">
+      <Link>LICENSE</Link>
+    </Content>
   </ItemGroup>
 
 </Project>
