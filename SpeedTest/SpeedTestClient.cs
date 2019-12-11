@@ -22,8 +22,7 @@ namespace SpeedTest
             "https://c.speedtest.net/speedtest-servers.php"
         };
 
-        //private readonly int[] downloadSizes = { 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000 };
-        private readonly int[] downloadSizes = { 350, 750, 1500 };
+        private static readonly int[] DownloadSizes = { 350, 750, 1500, 3000 };
         private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const int MaxUploadSize = 4; // 400 KB
 
@@ -168,7 +167,9 @@ namespace SpeedTest
                 builder.AppendFormat("content{0}=", sizeCounter);
 
                 for (var i = 0; i < size; ++i)
+                {
                     builder.Append(Chars[random.Next(Chars.Length)]);
+                }
 
                 for (var i = 0; i < retryCount; i++)
                 {
@@ -184,10 +185,10 @@ namespace SpeedTest
             return new Uri(new Uri(server.Url), ".").OriginalString + file;
         }
 
-        private IEnumerable<string> GenerateDownloadUrls(Server server, int retryCount)
+        private static IEnumerable<string> GenerateDownloadUrls(Server server, int retryCount)
         {
             var downloadUriBase = CreateTestUrl(server, "random{0}x{0}.jpg?r={1}");
-            foreach (var downloadSize in downloadSizes)
+            foreach (var downloadSize in DownloadSizes)
             {
                 for (var i = 0; i < retryCount; i++)
                 {
