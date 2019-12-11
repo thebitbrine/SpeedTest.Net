@@ -36,38 +36,36 @@ namespace SpeedTest
         /// <returns>speedtest.net settings</returns>
         public Settings GetSettings()
         {
-            using (var client = new SpeedTestHttpClient())
+            using var client = new SpeedTestHttpClient();
+            var settings = client.GetConfig<Settings>(ConfigUrl).GetAwaiter().GetResult();
+
+            var serversConfig = new ServersList();
+            foreach (var serversUrl in ServersUrls)
             {
-                var settings = client.GetConfig<Settings>(ConfigUrl).GetAwaiter().GetResult();
-
-                var serversConfig = new ServersList();
-                foreach (var serversUrl in ServersUrls)
+                try
                 {
-                    try
-                    {
-                        serversConfig = client.GetConfig<ServersList>(serversUrl).GetAwaiter().GetResult();
-                        if (serversConfig.Servers.Count > 0) break;
-                    }
-                    catch
-                    {
-                        //
-                    }
+                    serversConfig = client.GetConfig<ServersList>(serversUrl).GetAwaiter().GetResult();
+                    if (serversConfig.Servers.Count > 0) break;
                 }
-
-                if (serversConfig.Servers.Count <= 0)
+                catch
                 {
-                    throw new InvalidOperationException("SpeedTest does not return any server");
+                    //
                 }
-
-                var ignoredIds = settings.ServerConfig.IgnoreIds.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries);
-                serversConfig.CalculateDistances(settings.Client.GeoCoordinate);
-                settings.Servers = serversConfig.Servers
-                    .Where(s => !ignoredIds.Contains(s.Id.ToString()))
-                    .OrderBy(s => s.Distance)
-                    .ToList();
-
-                return settings;
             }
+
+            if (serversConfig.Servers.Count <= 0)
+            {
+                throw new InvalidOperationException("SpeedTest does not return any server");
+            }
+
+            var ignoredIds = settings.ServerConfig.IgnoreIds.Split(",", StringSplitOptions.RemoveEmptyEntries);
+            serversConfig.CalculateDistances(settings.Client.GeoCoordinate);
+            settings.Servers = serversConfig.Servers
+                .Where(s => !ignoredIds.Contains(s.Id.ToString()))
+                .OrderBy(s => s.Distance)
+                .ToList();
+
+            return settings;
         }
 
         /// <summary>
@@ -79,29 +77,28 @@ namespace SpeedTest
             var latencyUri = CreateTestUrl(server, "latency.txt");
             var timer = new Stopwatch();
 
-            using (var client = new SpeedTestHttpClient())
-            {
-                for (var i = 0; i < retryCount; i++)
-                {
-                    string testString;
-                    try
-                    {
-                        timer.Start();
-                        testString = client.GetStringAsync(latencyUri).ConfigureAwait(false).GetAwaiter().GetResult();
-                    }
-                    catch (WebException)
-                    {
-                        continue;
-                    }
-                    finally
-                    {
-                        timer.Stop();    
-                    }
+            using var client = new SpeedTestHttpClient();
 
-                    if (!testString.StartsWith("test=test"))
-                    {
-                        throw new InvalidOperationException("Server returned incorrect test string for latency.txt");
-                    }
+            for (var i = 0; i < retryCount; i++)
+            {
+                string testString;
+                try
+                {
+                    timer.Start();
+                    testString = client.GetStringAsync(latencyUri).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                catch (WebException)
+                {
+                    continue;
+                }
+                finally
+                {
+                    timer.Stop();    
+                }
+
+                if (!testString.StartsWith("test=test"))
+                {
+                    throw new InvalidOperationException("Server returned incorrect test string for latency.txt");
                 }
             }
 

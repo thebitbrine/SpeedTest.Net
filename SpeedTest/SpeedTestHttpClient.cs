@@ -20,12 +20,10 @@ namespace SpeedTest
 
         public async Task<T> GetConfig<T>(string url)
         {
-            var data = await base.GetStringAsync(AddTimeStamp(new Uri(url)));
+            var data = await GetStringAsync(AddTimeStamp(new Uri(url)));
             var xmlSerializer = new XmlSerializer(typeof(T));
-            using (var reader = new StringReader(data))
-            {
-                return (T)xmlSerializer.Deserialize(reader);
-            }
+            using var reader = new StringReader(data);
+            return (T)xmlSerializer.Deserialize(reader);
         }
 
         private static Uri AddTimeStamp(Uri address)
