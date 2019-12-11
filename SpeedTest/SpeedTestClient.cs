@@ -30,10 +30,8 @@ namespace SpeedTest
 
         #region ISpeedTestClient
 
-        /// <summary>
-        /// Download speedtest.net settings
-        /// </summary>
-        /// <returns>speedtest.net settings</returns>
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException"></exception>
         public Settings GetSettings()
         {
             using var client = new SpeedTestHttpClient();
@@ -68,10 +66,7 @@ namespace SpeedTest
             return settings;
         }
 
-        /// <summary>
-        /// Test latency (ping) to server
-        /// </summary>
-        /// <returns>Latency in milliseconds (ms)</returns>
+        /// <inheritdoc />
         public int TestServerLatency(Server server, int retryCount = 3)
         {
             var latencyUri = CreateTestUrl(server, "latency.txt");
@@ -105,11 +100,8 @@ namespace SpeedTest
             return (int)timer.ElapsedMilliseconds / retryCount;
         }
 
-        /// <summary>
-        /// Test download speed to server
-        /// </summary>
-        /// <returns>Download speed in Kbps</returns>
-        public double TestDownloadSpeed(Server server, int simultaniousDownloads = 2, int retryCount = 2)
+        /// <inheritdoc />
+        public double TestDownloadSpeed(Server server, int simultaneousDownloads = 2, int retryCount = 2)
         {
             var testData = GenerateDownloadUrls(server, retryCount);
 
@@ -117,31 +109,28 @@ namespace SpeedTest
             {
                 var data = await client.GetByteArrayAsync(url).ConfigureAwait(false);
                 return data.Length;
-            }, simultaniousDownloads);
+            }, simultaneousDownloads);
         }
-
-        /// <summary>
-        /// Test upload speed to server
-        /// </summary>
-        /// <returns>Upload speed in Kbps</returns>
-        public double TestUploadSpeed(Server server, int simultaniousUploads = 2, int retryCount = 2)
+        
+        /// <inheritdoc />
+        public double TestUploadSpeed(Server server, int simultaneousUploads = 2, int retryCount = 2)
         {
             var testData = GenerateUploadData(retryCount);
             return TestSpeed(testData, async (client, uploadData) =>
             {
                 await client.PostAsync(server.Url, new StringContent(uploadData));
                 return uploadData.Length;
-            }, simultaniousUploads);
+            }, simultaneousUploads);
         }
 
         #endregion
 
         #region Helpers
 
-        private static double TestSpeed<T>(IEnumerable<T> testData, Func<HttpClient, T, Task<int>> doWork, int concurencyCount = 2)
+        private static double TestSpeed<T>(IEnumerable<T> testData, Func<HttpClient, T, Task<int>> doWork, int concurrencyCount = 2)
         {
             var timer = new Stopwatch();
-            var throttler = new SemaphoreSlim(concurencyCount);
+            var throttler = new SemaphoreSlim(concurrencyCount);
 
             timer.Start();
             var downloadTasks = testData.Select(async data =>
